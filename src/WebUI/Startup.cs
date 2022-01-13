@@ -30,6 +30,7 @@ namespace WebUI
         {
 
             services.AddControllers();
+            services.AddCors();
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
@@ -54,6 +55,8 @@ namespace WebUI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
 
             app.UseAuthorization();
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebUI.DTOs
 {
-    public class RegisterDTO
+    public class RegisterDto
     {
         [Required]
         public string UserName { get; set; }

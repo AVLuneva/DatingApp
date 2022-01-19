@@ -21,7 +21,7 @@ namespace WebUI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<AppUser>> Register(RegisterDTO registerDto) 
+        public async Task<ActionResult<AppUser>> Register(RegisterDto registerDto) 
         {
             if (await UserExists(registerDto.UserName)) return BadRequest("Username is taken");
 
@@ -41,7 +41,7 @@ namespace WebUI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<AppUser>> Login(LoginDTO loginDto)
+        public async Task<ActionResult<AppUser>> Login(LoginDto loginDto)
         {
             var user = await _context.Users
                 .SingleOrDefaultAsync(x => x.UserName == loginDto.UserName);

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebUI.Data;
+using WebUI.Extensions;
 using WebUI.Interfaces;
 using WebUI.Services;
 
@@ -34,24 +35,10 @@ namespace WebUI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddDbContext<DataContext>(options =>
-            {
-                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
-            });            
+            services.AddAplicationServices(Configuration);           
             services.AddControllers();
             services.AddCors();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"])),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                });
+            services.AddIdentityServices(Configuration);
             
             services.AddSwaggerGen(c =>
             {

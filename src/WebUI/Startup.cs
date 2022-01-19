@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebUI.Data;
+using WebUI.Interfaces;
+using WebUI.Services;
 
 namespace WebUI
 {
@@ -29,6 +31,8 @@ namespace WebUI
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddScoped<ITokenService, TokenService>();
+            
             services.AddControllers();
             services.AddCors();
             services.AddDbContext<DataContext>(options =>

@@ -9,19 +9,22 @@ using Microsoft.EntityFrameworkCore;
 using WebUI.Data;
 using WebUI.DTOs;
 using WebUI.Entities;
+using WebUI.Interfaces;
 
 namespace WebUI.Controllers
 {
     public class AccountController : BaseApiController
     {
         private readonly DataContext _context;
-        public AccountController(DataContext context)
+        private readonly ITokenService _tokenSrvice;
+        public AccountController(DataContext context, ITokenService tokenSrvice)
         {
+            _tokenSrvice = tokenSrvice;
             _context = context;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<AppUser>> Register(RegisterDto registerDto) 
+        public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto) 
         {
             if (await UserExists(registerDto.UserName)) return BadRequest("Username is taken");
 
@@ -37,11 +40,15 @@ namespace WebUI.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return user;
+            return new UserDto
+            {
+                UserName = user.UserName,
+                Token = _tokenSrvice.CreateToken(user)
+            };
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<AppUser>> Login(LoginDto loginDto)
+        public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
             var user = await _context.Users
                 .SingleOrDefaultAsync(x => x.UserName == loginDto.UserName);
@@ -57,7 +64,11 @@ namespace WebUI.Controllers
                 if (computeHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
             }
 
-            return user;
+            return new UserDto
+            {
+                UserName = user.UserName,
+                Token = _tokenSrvice.CreateToken(user)
+            };
         }
 
         private async Task<bool> UserExists(string userName)

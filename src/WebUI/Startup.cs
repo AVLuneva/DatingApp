@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using WebUI.Data;
 using WebUI.Extensions;
 using WebUI.Interfaces;
+using WebUI.Middleware;
 using WebUI.Services;
 
 namespace WebUI
@@ -35,11 +36,11 @@ namespace WebUI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddAplicationServices(Configuration);           
+            services.AddAplicationServices(Configuration);
             services.AddControllers();
             services.AddCors();
             services.AddIdentityServices(Configuration);
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebUI", Version = "v1" });
@@ -49,12 +50,7 @@ namespace WebUI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebUI v1"));
-            }
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 

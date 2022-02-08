@@ -24,13 +24,13 @@ namespace WebUI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto) 
+        public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
             if (await UserExists(registerDto.UserName)) return BadRequest("Username is taken");
 
             using var hmac = new HMACSHA512();
 
-            var user = new AppUser 
+            var user = new AppUser
             {
                 UserName = registerDto.UserName.ToLower(),
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
@@ -51,8 +51,9 @@ namespace WebUI.Controllers
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
             var user = await _context.Users
+                .Include(p => p.Photos)
                 .SingleOrDefaultAsync(x => x.UserName == loginDto.UserName);
-            
+
             if (user == null) return Unauthorized("Invalid username");
 
             using var hmac = new HMACSHA512(user.PasswordSalt);
@@ -67,7 +68,8 @@ namespace WebUI.Controllers
             return new UserDto
             {
                 UserName = user.UserName,
-                Token = _tokenSrvice.CreateToken(user)
+                Token = _tokenSrvice.CreateToken(user),
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
             };
         }
 

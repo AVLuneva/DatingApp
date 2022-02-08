@@ -2,7 +2,12 @@
     <div class="col-2" *ngFor="let photo of member.photos">
         <img src="{{photo.url}}" alt="{{photo.url}}" class="img-thumbnail p-1">
         <div class="text-center">
-            <button class="btn btn-sm">Main</button>
+            <button
+                [disabled]="photo.isMain"
+                (click)="setMainPhoto(photo)"
+                [ngClass]='photo.isMain ? "btn-success active" : "btn-outline-success"'
+                class="btn btn-sm"
+                >Main</button>
             <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
         </div>
     </div>
@@ -53,21 +58,21 @@
         <div>
             <div>
                 Queue progress:
-                <div class="progress" style="">
+                <div class="progress">
                     <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }"></div>
                 </div>
             </div>
             <button type="button" class="btn btn-success btn-s"
                     (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
-                <span class="fa fa-upload"></span> Upload all
+                <span class="fa fa--upload"></span> Upload all
             </button>
             <button type="button" class="btn btn-warning btn-s"
                     (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
-                <span class="fa fa-ban"></span> Cancel all
+                <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
             </button>
             <button type="button" class="btn btn-danger btn-s"
                     (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
-                <span class="fa fa-trash"></span> Remove all
+                <span class="glyphicon glyphicon-trash"></span> Remove all
             </button>
         </div>
 

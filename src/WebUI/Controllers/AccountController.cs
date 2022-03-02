@@ -47,6 +47,7 @@ namespace WebUI.Controllers
                 UserName = user.UserName,
                 Token = _tokenSrvice.CreateToken(user),
                 KnownAs = user.KnownAs,
+                Gender = user.Gender
             };
         }
 
@@ -74,6 +75,7 @@ namespace WebUI.Controllers
                 Token = _tokenSrvice.CreateToken(user),
                 PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
                 KnownAs = user.KnownAs,
+                Gender = user.Gender
             };
         }
 

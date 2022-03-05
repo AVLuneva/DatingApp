@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebUI.DTOs;
 using WebUI.Entities;
 using WebUI.Extensions;
+using WebUI.Helpers;
 using WebUI.Interfaces;
 
 namespace WebUI.Controllers
@@ -48,14 +49,17 @@ namespace WebUI.Controllers
             if (await _userRepository.SaveAllAsync()) return Ok();
 
             return BadRequest("Faled to like user");
-      }
+        }
 
-      [HttpGet]
-      public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes(string predicate)
-      {
-          var users = await _likesRepository.GetUserLikes(predicate, User.GetUserId());
-          
-          return Ok(users);
-      }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
+        {
+            likesParams.UserId = User.GetUserId();
+            var users = await _likesRepository.GetUserLikes(likesParams);
+
+            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+
+            return Ok(users);
+        }
     }
 }

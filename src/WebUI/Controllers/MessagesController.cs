@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebUI.DTOs;
 using WebUI.Entities;
 using WebUI.Extensions;
+using WebUI.Helpers;
 using WebUI.Interfaces;
 
 namespace WebUI.Controllers
@@ -52,6 +53,18 @@ namespace WebUI.Controllers
             if (await _messageRepository.SaveAllAsync()) return Ok(_mapper.Map<MessageDto>(message));
 
             return BadRequest("Failed to send message");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessagesForUser([FromQuery] MessageParams messageParams)
+        {
+            messageParams.UserName = User.GetUserName();
+
+            var messages = await _messageRepository.GetMessagesForUser(messageParams);
+
+            Response.AddPaginationHeader(messages.CurrentPage, messages.PageSize, messages.TotalCount, messages.TotalPages);
+
+            return messages;
         }
     }
 }

@@ -37,10 +37,14 @@ namespace WebUI.Controllers
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
+            var roleResult = await _userManager.AddToRoleAsync(user, "Member");
+            
+            if (!roleResult.Succeeded) return BadRequest(result.Errors);
+
             return new UserDto
             {
                 UserName = user.UserName,
-                Token = _tokenSrvice.CreateToken(user),
+                Token = await _tokenSrvice.CreateToken(user),
                 KnownAs = user.KnownAs,
                 Gender = user.Gender
             };
@@ -62,7 +66,7 @@ namespace WebUI.Controllers
             return new UserDto
             {
                 UserName = user.UserName,
-                Token = _tokenSrvice.CreateToken(user),
+                Token = await _tokenSrvice.CreateToken(user),
                 PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
                 KnownAs = user.KnownAs,
                 Gender = user.Gender

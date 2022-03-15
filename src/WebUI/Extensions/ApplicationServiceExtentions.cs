@@ -9,6 +9,7 @@ using WebUI.Data;
 using WebUI.Helpers;
 using WebUI.Interfaces;
 using WebUI.Services;
+using WebUI.SignalR;
 
 namespace WebUI.Extensions
 {
@@ -16,6 +17,7 @@ namespace WebUI.Extensions
     {
         public static IServiceCollection AddAplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSingleton<PresenceTracker>();
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();

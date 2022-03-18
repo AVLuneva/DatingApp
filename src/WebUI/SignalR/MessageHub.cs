@@ -16,8 +16,14 @@ namespace WebUI.SignalR
         private readonly IMessageRepository _messageRepository;
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
-        public MessageHub(IMessageRepository messageRepository, IMapper mapper, IUserRepository userRepository)
+        private readonly IHubContext<PresenceHub> _presenceHub;
+        private readonly PresenceTracker _tracker;
+        public MessageHub(IMessageRepository messageRepository, IMapper mapper,
+            IUserRepository userRepository, IHubContext<PresenceHub> presenceHub,
+            PresenceTracker tracker)
         {
+            _tracker = tracker;
+            _presenceHub = presenceHub;
             _userRepository = userRepository;
             _mapper = mapper;
             _messageRepository = messageRepository;
@@ -29,7 +35,7 @@ namespace WebUI.SignalR
             var otherUser = httpContext.Request.Query["user"].ToString();
             var groupName = GetGroupName(Context.User.GetUserName(), otherUser);
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            await AddToGroup(Context, groupName);
+            await AddToGroup(groupName);
 
             var messages = await _messageRepository.GetMessageThread(Context.User.GetUserName(), otherUser);
 
@@ -71,6 +77,15 @@ namespace WebUI.SignalR
             {
                 message.DateRead = DateTime.UtcNow;
             }
+            else
+            {
+                var connections = await _tracker.GetConnectionsForUser(recipient.UserName);
+                if(connections != null)
+                {
+                    await _presenceHub.Clients.Clients(connections).SendAsync("NewMessageReceived",
+                        new {userName = sender.UserName, knownAs = sender.KnownAs});
+                }
+            }
 
             _messageRepository.AddMessage(message);
 
@@ -80,7 +95,7 @@ namespace WebUI.SignalR
             }
         }
 
-        private async Task<bool> AddToGroup(HubCallerContext context, string groupName)
+        private async Task<bool> AddToGroup(string groupName)
         {
             var group = await _messageRepository.GetMessageGroup(groupName);
             var connection = new Connection(Context.ConnectionId, Context.User.GetUserName());

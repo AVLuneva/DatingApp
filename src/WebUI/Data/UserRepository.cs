@@ -65,6 +65,13 @@ namespace WebUI.Data
             .SingleOrDefaultAsync(x => x.UserName == username);
         }
 
+        public async Task<string> GetUserGender(string userName)
+        {
+            return await _context.Users
+                .Where(x => x.UserName == userName)
+                .Select(x => x.Gender).FirstOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<AppUser>> GetUsersAsync()
         {
             return await _context.Users

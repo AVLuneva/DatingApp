@@ -70,12 +70,12 @@ namespace WebUI.Data
             var query = _context.Messages
                 .OrderByDescending(m => m.MessageSent)
                 .AsQueryable();
-            
+
             query = messageParams.Container switch
             {
-                "Inbox" => query.Where(u => u.Recipient.UserName == messageParams.UserName 
+                "Inbox" => query.Where(u => u.Recipient.UserName == messageParams.UserName
                     && u.RecipientDeleted == false),
-                "Outbox" => query.Where(u => u.Sender.UserName == messageParams.UserName 
+                "Outbox" => query.Where(u => u.Sender.UserName == messageParams.UserName
                     && u.SenderDeleted == false),
                 _ => query.Where(u => u.Recipient.UserName == messageParams.UserName && u.RecipientDeleted == false && u.DateRead == null)
             };
@@ -98,12 +98,12 @@ namespace WebUI.Data
                 .OrderBy(m => m.MessageSent)
                 .ToListAsync();
 
-             var unreadMessages = messages.Where(m => m.DateRead == null
-                    && m.Recipient.UserName == currentUserName).ToList();
+            var unreadMessages = messages.Where(m => m.DateRead == null
+                   && m.Recipient.UserName == currentUserName).ToList();
 
             if (unreadMessages.Any())
             {
-                foreach(var message in unreadMessages)
+                foreach (var message in unreadMessages)
                 {
                     message.DateRead = DateTime.UtcNow;
                 }
@@ -117,11 +117,6 @@ namespace WebUI.Data
         public void RemoveConnection(Connection connection)
         {
             _context.Connections.Remove(connection);
-        }
-
-        public async Task<bool> SaveAllAsync()
-        {
-            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

@@ -32,8 +32,8 @@ namespace WebUI.Data
 
         public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
         {
-             var query = _context.Users.AsQueryable();
-            
+            var query = _context.Users.AsQueryable();
+
             query = query.Where(u => u.UserName != userParams.CurrentUserName);
             query = query.Where(u => u.Gender == userParams.Gender);
 
@@ -70,11 +70,6 @@ namespace WebUI.Data
             return await _context.Users
             .Include(p => p.Photos)
             .ToListAsync();
-        }
-
-        public async Task<bool> SaveAllAsync()
-        {
-            return await _context.SaveChangesAsync() > 0;
         }
 
         public void Update(AppUser user)
